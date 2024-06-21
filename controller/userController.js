@@ -1,27 +1,3 @@
-// const userSc = require("../schema/userSchema");
-// require("dotenv").config();
-
-// signUp = async (req, res) => {
-//   try {
-//     let user = await userSc.create(req.body);
-//     user = user.toObject();
-//     res.status(200).json({
-//       type: "success",
-//       message: "User Created",
-//       data: {
-//         user: user,
-//       },
-//     });
-//   } catch (error) {
-//     res.status(500).send({
-//       statusCode: 500,
-//       message: `Internal server error : ${error}`,
-//     });
-//   }
-//   return;
-// };
-
-// module.exports = { signUp };
 const userSc = require("../schema/userSchema");
 
 const signUp = async (req, res) => {
@@ -47,10 +23,7 @@ const getInfo = async (req, res) => {
   try {
     // Implement logic to retrieve specific data
     // For example, retrieving all users with specific fields
-    const users = await userSc.find(
-      {},
-      { _id: 0, books: 1, date: 1 }
-    );
+    const users = await userSc.find({}, { _id: 0, books: 1, date: 1 });
 
     res.status(200).json({
       type: "success",
@@ -65,7 +38,55 @@ const getInfo = async (req, res) => {
   }
 };
 
+const updateBooks = async (req, res) => {
+  const { aadharNumber, books } = req.body;
+
+  try {
+    // Check if 'books' field is present in req.body
+    if (!books) {
+      return res.status(400).json({
+        statusCode: 400,
+        message: "Books field is required in the request body",
+      });
+    }
+
+    // Construct update object based on req.body
+    const updateObject = {};
+    if (books.A4 !== undefined) {
+      updateObject["books.A4"] = books.A4;
+    }
+    if (books.Long !== undefined) {
+      updateObject["books.Long"] = books.Long;
+    }
+    // Update the user document
+    const updatedUser = await userSc.findOneAndUpdate(
+      { aadharNumber },
+      { $set: updateObject },
+      { new: true } // To return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        statusCode: 404,
+        message: `User with Aadhar Number ${aadharNumber} not found`,
+      });
+    }
+
+    res.status(200).json({
+      type: "success",
+      message: "Books updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      statusCode: 500,
+      message: `Internal server error: ${error}`,
+    });
+  }
+};
+
 module.exports = {
   signUp,
   getInfo,
+  updateBooks,
 };

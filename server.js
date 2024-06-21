@@ -27,9 +27,7 @@ app.get("/test", (req, res) => {
   });
 });
 
-
-app.use("/user", userRouter); 
-
+app.use("/user", userRouter);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on PORT ${PORT}`);
