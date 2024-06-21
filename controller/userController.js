@@ -21,9 +21,17 @@ const signUp = async (req, res) => {
 
 const getInfo = async (req, res) => {
   try {
-    // Implement logic to retrieve specific data
-    // For example, retrieving all users with specific fields
-    const users = await userSc.find({}, { _id: 0, books: 1, date: 1 });
+    // Retrieve specific fields from the user documents
+    const users = await userSc.find(
+      {},
+      {
+        _id: 0, // Exclude the _id field
+        userName: 1, // Include the userName field
+        aadharNumber: 1, // Include the aadharNumber field
+        date: 1, // Include the date field
+        books: 1, // Include the books field
+      }
+    );
 
     res.status(200).json({
       type: "success",
