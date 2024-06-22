@@ -21,23 +21,53 @@ const signUp = async (req, res) => {
 
 const getInfo = async (req, res) => {
   try {
-    // Retrieve specific fields from the user documents
-    const users = await userSc.find(
-      {},
-      {
-        _id: 0, // Exclude the _id field
-        userName: 1, // Include the userName field
-        aadharNumber: 1, // Include the aadharNumber field
-        date: 1, // Include the date field
-        books: 1, // Include the books field
-      }
-    );
+    // Check if Aadhar number is provided in params
+    const { aadharNumber } = req.params;
 
-    res.status(200).json({
-      type: "success",
-      message: "Users retrieved successfully",
-      data: users,
-    });
+    if (aadharNumber) {
+      // Retrieve specific user data
+      const user = await userSc.findOne(
+        { aadharNumber },
+        {
+          _id: 0, // Exclude the _id field
+          userName: 1, // Include the userName field
+          aadharNumber: 1, // Include the aadharNumber field
+          date: 1, // Include the date field
+          books: 1, // Include the books field
+        }
+      );
+
+      if (!user) {
+        return res.status(404).json({
+          statusCode: 404,
+          message: `User with Aadhar Number ${aadharNumber} not found`,
+        });
+      }
+
+      res.status(200).json({
+        type: "success",
+        message: "User retrieved successfully",
+        data: user,
+      });
+    } else {
+      // Retrieve all users data
+      const users = await userSc.find(
+        {},
+        {
+          _id: 0, // Exclude the _id field
+          userName: 1, // Include the userName field
+          aadharNumber: 1, // Include the aadharNumber field
+          date: 1, // Include the date field
+          books: 1, // Include the books field
+        }
+      );
+
+      res.status(200).json({
+        type: "success",
+        message: "Users retrieved successfully",
+        data: users,
+      });
+    }
   } catch (error) {
     res.status(500).send({
       statusCode: 500,

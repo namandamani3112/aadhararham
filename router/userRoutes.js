@@ -7,7 +7,7 @@ const {
 const Router = express.Router();
 
 Router.route("/signup").post(signUp);
-Router.route("/info").get(getInfo);
+Router.get("/info/:aadharNumber?", getInfo); // Allow optional Aadhar number parameter
 Router.patch("/update-books", updateBooks);
 
 module.exports = Router;
